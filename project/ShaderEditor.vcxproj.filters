@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\external">
+      <UniqueIdentifier>{3864a14e-2e25-4baa-8848-26db940e83b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\external\imgui-1.49">
+      <UniqueIdentifier>{c384686e-8504-4b5a-8774-fd861310a8c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\external\asura_sdk">
+      <UniqueIdentifier>{b2b9b649-ec06-47a2-bce7-b11d5ed9e4ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\external\tinyxml2">
+      <UniqueIdentifier>{74cfde7d-3a54-42fd-9975-7fcae3f1418c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\App.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\imgui-1.49\imgui.cpp">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\imgui-1.49\imgui_draw.cpp">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Gui.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ShaderEditor.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\asura_sdk\StringHelper.cpp">
+      <Filter>ソース ファイル\external\asura_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\asura_sdk\Tokenizer.cpp">
+      <Filter>ソース ファイル\external\asura_sdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\EditData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BuiltinNode.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\tinyxml2\tinyxml2.cpp">
+      <Filter>ソース ファイル\external\tinyxml2</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\App.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui-1.49\imconfig.h">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui-1.49\imgui.h">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui-1.49\imgui_internal.h">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui-1.49\stb_rect_pack.h">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui-1.49\stb_textedit.h">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui-1.49\stb_truetype.h">
+      <Filter>ソース ファイル\external\imgui-1.49</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Gui.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ShaderEditor.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\asura_sdk\StringHelper.h">
+      <Filter>ソース ファイル\external\asura_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\asura_sdk\Tokenizer.h">
+      <Filter>ソース ファイル\external\asura_sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\EditData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\BuiltinNode.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\tinyxml2\tinyxml2.h">
+      <Filter>ソース ファイル\external\tinyxml2</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="app.manifest" />
+  </ItemGroup>
+</Project>
