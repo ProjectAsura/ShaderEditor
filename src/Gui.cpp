@@ -9,7 +9,7 @@
 //-------------------------------------------------------------------------------------------------
 #include <Gui.h>
 #include <d3dcompiler.h>
-#include <imgui-1.49/imgui.h>
+#include <imgui/imgui.h>
 
 
 namespace {
@@ -21,12 +21,6 @@ struct TransformBuffer
 {
     float WorldViewProjection[ 4 ][ 4 ];
 };
-
-//-------------------------------------------------------------------------------------------------
-//      描画処理を行います.
-//-------------------------------------------------------------------------------------------------
-void DrawFunc( ImDrawData* draw_data )
-{ GuiMgr::GetInstance().OnDraw( draw_data ); }
 
 static const ImWchar glyphRangesJapanese[] = {
     0x0020, 0x007E, 0x00A2, 0x00A3, 0x00A7, 0x00A8, 0x00AC, 0x00AC, 0x00B0, 0x00B1, 0x00B4, 0x00B4, 0x00B6, 0x00B6, 0x00D7, 0x00D7, 
@@ -585,13 +579,14 @@ bool GuiMgr::Init
     uint32_t                height
 )
 {
-    m_pDevice = pDevice;
+    m_pDevice  = pDevice;
     m_pContext = pContext;
 
+    ImGui::CreateContext();
     auto& io = ImGui::GetIO();
 
     {
-        io.Fonts->AddFontFromFileTTF("../res/fonts/07やさしさゴシック.ttf", 12.0f, nullptr, glyphRangesJapanese);
+        io.Fonts->AddFontFromFileTTF(u8"../res/fonts/07やさしさゴシック.ttf", 12.0f, nullptr, glyphRangesJapanese);
 
         uint8_t* pPixels;
         int width;
@@ -608,20 +603,20 @@ bool GuiMgr::Init
         desc.Usage              = D3D11_USAGE_DEFAULT;
         desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE;
 
-        D3D11_SUBRESOURCE_DATA res;
-        res.pSysMem = pPixels;
-        res.SysMemPitch = desc.Width * 4;
-        res.SysMemSlicePitch = 0;
+        D3D11_SUBRESOURCE_DATA res = {};
+        res.pSysMem             = pPixels;
+        res.SysMemPitch         = desc.Width * 4;
+        res.SysMemSlicePitch    = 0;
 
         auto hr = m_pDevice->CreateTexture2D( &desc, &res, m_pTexture.GetAddressOf() );
         if ( FAILED( hr ) )
         { return false; }
 
         D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc = {};
-        viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        viewDesc.Texture2D.MipLevels = desc.MipLevels;
-        viewDesc.Texture2D.MostDetailedMip = 0;
+        viewDesc.Format                     = DXGI_FORMAT_R8G8B8A8_UNORM;
+        viewDesc.ViewDimension              = D3D11_SRV_DIMENSION_TEXTURE2D;
+        viewDesc.Texture2D.MipLevels        = desc.MipLevels;
+        viewDesc.Texture2D.MostDetailedMip  = 0;
 
         hr = m_pDevice->CreateShaderResourceView( m_pTexture.Get(), &viewDesc, m_pSRV.GetAddressOf() );
         if ( FAILED( hr ) )
@@ -632,14 +627,14 @@ bool GuiMgr::Init
 
     {
         D3D11_SAMPLER_DESC desc = {};
-        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-        desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-        desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        desc.MipLODBias = 0.0f;
+        desc.Filter         = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        desc.AddressU       = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressV       = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.AddressW       = D3D11_TEXTURE_ADDRESS_WRAP;
+        desc.MipLODBias     = 0.0f;
         desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-        desc.MinLOD = 0.0f;
-        desc.MaxLOD = FLT_MAX;
+        desc.MinLOD         = 0.0f;
+        desc.MaxLOD         = FLT_MAX;
 
         auto hr = m_pDevice->CreateSamplerState( &desc, m_pSmp.GetAddressOf() );
         if ( FAILED( hr ) )
@@ -835,7 +830,6 @@ bool GuiMgr::Init
         io.KeyMap[ ImGuiKey_Y ]         = 'Y';
         io.KeyMap[ ImGuiKey_Z ]         = 'Z';
 
-        io.RenderDrawListsFn = DrawFunc;
         io.SetClipboardTextFn = nullptr;
         io.GetClipboardTextFn = nullptr;
         io.ImeWindowHandle = hWnd;
@@ -848,12 +842,10 @@ bool GuiMgr::Init
 
         auto& style = ImGui::GetStyle();
         style.WindowRounding = 2.0f;
-        style.ChildWindowRounding = 2.0f;
 
         style.Colors[ ImGuiCol_Text ]                   = ImVec4( 1.000000f, 1.000000f, 1.000000f, 1.000000f );
         style.Colors[ ImGuiCol_TextDisabled ]           = ImVec4( 0.400000f, 0.400000f, 0.400000f, 1.000000f );
         style.Colors[ ImGuiCol_WindowBg ]               = ImVec4( 0.060000f, 0.060000f, 0.060000f, 0.752000f );
-        style.Colors[ ImGuiCol_ChildWindowBg ]          = ImVec4( 1.000000f, 1.000000f, 1.000000f, 0.000000f );
         style.Colors[ ImGuiCol_PopupBg ]                = ImVec4( 0.000000f, 0.000000f, 0.000000f, 0.752000f );
         style.Colors[ ImGuiCol_Border ]                 = ImVec4( 1.000000f, 1.000000f, 1.000000f, 0.312000f );
         style.Colors[ ImGuiCol_BorderShadow ]           = ImVec4( 0.000000f, 0.000000f, 0.000000f, 0.080000f );
@@ -868,7 +860,6 @@ bool GuiMgr::Init
         style.Colors[ ImGuiCol_ScrollbarGrab ]          = ImVec4( 0.310000f, 0.310000f, 0.310000f, 1.000000f );
         style.Colors[ ImGuiCol_ScrollbarGrabHovered ]   = ImVec4( 0.410000f, 0.410000f, 0.410000f, 1.000000f );
         style.Colors[ ImGuiCol_ScrollbarGrabActive ]    = ImVec4( 0.510000f, 0.510000f, 0.510000f, 1.000000f );
-        style.Colors[ ImGuiCol_ComboBg ]                = ImVec4( 0.140000f, 0.140000f, 0.140000f, 0.792000f );
         style.Colors[ ImGuiCol_CheckMark ]              = ImVec4( 0.260000f, 0.590000f, 0.980000f, 1.000000f );
         style.Colors[ ImGuiCol_SliderGrab ]             = ImVec4( 0.240000f, 0.520000f, 0.880000f, 1.000000f );
         style.Colors[ ImGuiCol_SliderGrabActive ]       = ImVec4( 0.260000f, 0.590000f, 0.980000f, 1.000000f );
@@ -878,23 +869,14 @@ bool GuiMgr::Init
         style.Colors[ ImGuiCol_Header ]                 = ImVec4( 0.260000f, 0.590000f, 0.980000f, 0.248000f );
         style.Colors[ ImGuiCol_HeaderHovered ]          = ImVec4( 0.260000f, 0.590000f, 0.980000f, 0.640000f );
         style.Colors[ ImGuiCol_HeaderActive ]           = ImVec4( 0.260000f, 0.590000f, 0.980000f, 1.000000f );
-        style.Colors[ ImGuiCol_Column ]                 = ImVec4( 0.610000f, 0.610000f, 0.610000f, 1.000000f );
-        style.Colors[ ImGuiCol_ColumnHovered ]          = ImVec4( 0.260000f, 0.590000f, 0.980000f, 0.624000f );
-        style.Colors[ ImGuiCol_ColumnActive ]           = ImVec4( 0.260000f, 0.590000f, 0.980000f, 1.000000f );
         style.Colors[ ImGuiCol_ResizeGrip ]             = ImVec4( 0.000000f, 0.000000f, 0.000000f, 0.400000f );
         style.Colors[ ImGuiCol_ResizeGripHovered ]      = ImVec4( 0.260000f, 0.590000f, 0.980000f, 0.536000f );
         style.Colors[ ImGuiCol_ResizeGripActive ]       = ImVec4( 0.260000f, 0.590000f, 0.980000f, 0.760000f );
-        style.Colors[ ImGuiCol_CloseButton ]            = ImVec4( 0.410000f, 0.410000f, 0.410000f, 0.400000f );
-        style.Colors[ ImGuiCol_CloseButtonHovered ]     = ImVec4( 0.980000f, 0.390000f, 0.360000f, 1.000000f );
-        style.Colors[ ImGuiCol_CloseButtonActive ]      = ImVec4( 0.980000f, 0.390000f, 0.360000f, 1.000000f );
         style.Colors[ ImGuiCol_PlotLines ]              = ImVec4( 0.610000f, 0.610000f, 0.610000f, 1.000000f );
         style.Colors[ ImGuiCol_PlotLinesHovered ]       = ImVec4( 1.000000f, 0.430000f, 0.350000f, 1.000000f );
         style.Colors[ ImGuiCol_PlotHistogram ]          = ImVec4( 0.900000f, 0.700000f, 0.000000f, 1.000000f );
         style.Colors[ ImGuiCol_PlotHistogramHovered ]   = ImVec4( 1.000000f, 0.600000f, 0.000000f, 1.000000f );
         style.Colors[ ImGuiCol_TextSelectedBg ]         = ImVec4( 0.260000f, 0.590000f, 0.980000f, 0.280000f );
-        style.Colors[ ImGuiCol_ModalWindowDarkening ]   = ImVec4( 0.800000f, 0.800000f, 0.800000f, 0.280000f );
-
-        ImGui::NewFrame();
     }
 
     m_LastTime = std::chrono::system_clock::now();
@@ -908,20 +890,21 @@ bool GuiMgr::Init
 //-------------------------------------------------------------------------------------------------
 void GuiMgr::Term()
 {
-    m_pVB.Reset();
-    m_pIB.Reset();
-    m_pCB.Reset();
-    m_pSmp.Reset();
-    m_pTexture.Reset();
-    m_pSRV.Reset();
-    m_pRS.Reset();
-    m_pBS.Reset();
-    m_pDSS.Reset();
-    m_pIL.Reset();
-    m_pVS.Reset();
-    m_pPS.Reset();
-    m_pContext.Reset();
-    m_pDevice.Reset();
+    m_pVB       .Reset();
+    m_pIB       .Reset();
+    m_pCB       .Reset();
+    m_pSmp      .Reset();
+    m_pTexture  .Reset();
+    m_pSRV      .Reset();
+    m_pRS       .Reset();
+    m_pBS       .Reset();
+    m_pDSS      .Reset();
+    m_pIL       .Reset();
+    m_pVS       .Reset();
+    m_pPS       .Reset();
+    m_pContext  .Reset();
+    m_pDevice   .Reset();
+    ImGui::DestroyContext();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -929,17 +912,17 @@ void GuiMgr::Term()
 //-------------------------------------------------------------------------------------------------
 void GuiMgr::Update( uint32_t width, uint32_t height )
 {
-    auto time = std::chrono::system_clock::now();
-    auto elapsedMilliSec = std::chrono::duration_cast<std::chrono::milliseconds>( time - m_LastTime ).count();
-    auto elapsedSec = float( elapsedMilliSec / 1000.0 );
+    auto time            = std::chrono::system_clock::now();
+    auto elapsedMilliSec = std::chrono::duration_cast<std::chrono::microseconds>( time - m_LastTime ).count();
+    auto elapsedSec      = float( elapsedMilliSec / (1000.0 * 1000.0) );
 
     auto& io = ImGui::GetIO();
-    io.DeltaTime = elapsedSec;
-    io.DisplaySize.x = float( width );
-    io.DisplaySize.y = float( height );
-    io.KeyCtrl = ( GetKeyState( VK_CONTROL ) & 0x8000 ) != 0;
-    io.KeyShift = ( GetKeyState( VK_SHIFT ) & 0x8000 ) != 0;
-    io.KeyAlt = ( GetKeyState( VK_MENU ) & 0x8000 ) != 0;
+    io.DeltaTime        = elapsedSec;
+    io.DisplaySize.x    = float( width );
+    io.DisplaySize.y    = float( height );
+    io.KeyCtrl          = ( GetKeyState( VK_CONTROL ) & 0x8000 ) != 0;
+    io.KeyShift         = ( GetKeyState( VK_SHIFT ) & 0x8000 ) != 0;
+    io.KeyAlt           = ( GetKeyState( VK_MENU ) & 0x8000 ) != 0;
 
     ImGui::NewFrame();
 
@@ -952,6 +935,7 @@ void GuiMgr::Update( uint32_t width, uint32_t height )
 void GuiMgr::Draw()
 {
     ImGui::Render();
+    OnDraw(ImGui::GetDrawData());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -966,9 +950,9 @@ void GuiMgr::OnDraw( ImDrawData* pDrawData )
         m_SizeVB = pDrawData->TotalVtxCount + 5000;
 
         D3D11_BUFFER_DESC desc = {};
-        desc.Usage = D3D11_USAGE_DYNAMIC;
-        desc.ByteWidth = m_SizeVB * sizeof( ImDrawVert );
-        desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        desc.Usage          = D3D11_USAGE_DYNAMIC;
+        desc.ByteWidth      = m_SizeVB * sizeof( ImDrawVert );
+        desc.BindFlags      = D3D11_BIND_VERTEX_BUFFER;
         desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
         auto hr = m_pDevice->CreateBuffer( &desc, nullptr, m_pVB.GetAddressOf() );
@@ -983,9 +967,9 @@ void GuiMgr::OnDraw( ImDrawData* pDrawData )
         m_SizeIB = pDrawData->TotalIdxCount + 10000;
 
         D3D11_BUFFER_DESC desc = {};
-        desc.Usage = D3D11_USAGE_DYNAMIC;
-        desc.ByteWidth = m_SizeIB * sizeof( ImDrawIdx );
-        desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        desc.Usage          = D3D11_USAGE_DYNAMIC;
+        desc.ByteWidth      = m_SizeIB * sizeof( ImDrawIdx );
+        desc.BindFlags      = D3D11_BIND_INDEX_BUFFER;
         desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
         auto hr = m_pDevice->CreateBuffer( &desc, nullptr, m_pIB.GetAddressOf() );
@@ -1039,12 +1023,12 @@ void GuiMgr::OnDraw( ImDrawData* pDrawData )
 
     {
         D3D11_VIEWPORT viewport = {};
-        viewport.TopLeftX = 0.0f;
-        viewport.TopLeftY = 0.0f;
-        viewport.Width = ImGui::GetIO().DisplaySize.x;
-        viewport.Height = ImGui::GetIO().DisplaySize.y;
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
+        viewport.TopLeftX   = 0.0f;
+        viewport.TopLeftY   = 0.0f;
+        viewport.Width      = ImGui::GetIO().DisplaySize.x;
+        viewport.Height     = ImGui::GetIO().DisplaySize.y;
+        viewport.MinDepth   = 0.0f;
+        viewport.MaxDepth   = 1.0f;
 
         m_pContext->RSSetViewports( 1, &viewport );
     }

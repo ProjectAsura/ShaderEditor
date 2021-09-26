@@ -149,8 +149,10 @@
   <ItemGroup>
     <ClCompile Include="..\external\asura_sdk\StringHelper.cpp" />
     <ClCompile Include="..\external\asura_sdk\Tokenizer.cpp" />
-    <ClCompile Include="..\external\imgui-1.49\imgui.cpp" />
-    <ClCompile Include="..\external\imgui-1.49\imgui_draw.cpp" />
+    <ClCompile Include="..\external\imgui\imgui.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\external\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="..\src\App.cpp" />
     <ClCompile Include="..\src\BuiltinNode.cpp" />
@@ -162,12 +164,12 @@
   <ItemGroup>
     <ClInclude Include="..\external\asura_sdk\StringHelper.h" />
     <ClInclude Include="..\external\asura_sdk\Tokenizer.h" />
-    <ClInclude Include="..\external\imgui-1.49\imconfig.h" />
-    <ClInclude Include="..\external\imgui-1.49\imgui.h" />
-    <ClInclude Include="..\external\imgui-1.49\imgui_internal.h" />
-    <ClInclude Include="..\external\imgui-1.49\stb_rect_pack.h" />
-    <ClInclude Include="..\external\imgui-1.49\stb_textedit.h" />
-    <ClInclude Include="..\external\imgui-1.49\stb_truetype.h" />
+    <ClInclude Include="..\external\imgui\imconfig.h" />
+    <ClInclude Include="..\external\imgui\imgui.h" />
+    <ClInclude Include="..\external\imgui\imgui_internal.h" />
+    <ClInclude Include="..\external\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\external\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\external\imgui\imstb_truetype.h" />
     <ClInclude Include="..\external\tinyxml2\tinyxml2.h" />
     <ClInclude Include="..\include\App.h" />
     <ClInclude Include="..\include\BuiltinNode.h" />

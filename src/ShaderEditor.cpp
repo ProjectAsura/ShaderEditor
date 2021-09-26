@@ -4,8 +4,8 @@
 #include <ShaderEditor.h>
 #include <Windows.h>
 #include <shlobj.h>
-#include <imgui-1.49/imgui.h>
-#include <imgui-1.49/imgui_internal.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 #include <asura_sdk/StringHelper.h>
 #include <BuiltinNode.h>
 
@@ -383,13 +383,13 @@ bool ImGuiDragSlot(Slot* slot, ImGuiID* hoverredId, bool& remove)
     }
     slot->Pos = center;
 
-    if (!ImGui::ItemAdd(total_bb, &id))
+    if (!ImGui::ItemAdd(total_bb, id))
     {
         ImGui::ItemSize(total_bb, style.FramePadding.y);
         return false;
     }
 
-    const bool hoverred = ImGui::IsHovered(total_bb, id);
+    const bool hoverred = ImGui::IsItemHovered();
     if (hoverred)
     {
         g.HoveredId = id;
@@ -423,7 +423,7 @@ bool ImGuiDragSlot(Slot* slot, ImGuiID* hoverredId, bool& remove)
             ImGui::GetWindowDrawList()->AddBezierCurve(
                 center,
                 center + ImVec2(+50.0f, 0.0f),
-                dst + ImVec2(-50.0f, 0.0f),
+                dst    + ImVec2(-50.0f, 0.0f),
                 dst,
                 ImColor(255, 255, 100),
                 3.0f);
@@ -432,7 +432,7 @@ bool ImGuiDragSlot(Slot* slot, ImGuiID* hoverredId, bool& remove)
         {
             ImGui::GetWindowDrawList()->AddBezierCurve(
                 dst,
-                dst + ImVec2(+50.0f, 0.0f),
+                dst    + ImVec2(+50.0f, 0.0f),
                 center + ImVec2(-50.0f, 0.0f),
                 center,
                 ImColor(255, 255, 100),
@@ -459,7 +459,7 @@ void ImGuiRect(ImVec2 size_arg, ImVec4 color)
 
     const ImRect bb(pos, pos + size);
     ImGui::ItemSize(bb, style.FramePadding.y);
-    if (!ImGui::ItemAdd(bb, &id))
+    if (!ImGui::ItemAdd(bb, id))
         return;
 
     // Render
@@ -584,8 +584,8 @@ void Editor::DrawEditPanel()
 
     ImVec2 panelSize = ImVec2(m_Size.x - 400.0f, m_Size.y);
 
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiSetCond_Once);
-    ImGui::SetNextWindowSize(panelSize, ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(panelSize, ImGuiCond_Once);
 
     if (!ImGui::Begin(u8"ノードエディタ"))
     {
@@ -596,7 +596,7 @@ void Editor::DrawEditPanel()
     ImGui::BeginGroup();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1.0f, 1.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImColor(50, 50, 50, 200));
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImU32(ImColor(50, 50, 50, 200)));
 
     int flag = 0;
     flag |= ImGuiWindowFlags_NoScrollbar;
@@ -638,7 +638,7 @@ void Editor::DrawEditPanel()
     {
         // 右クリックされたかどうか?
         if (!ImGui::IsAnyItemHovered()
-          && ImGui::IsMouseHoveringWindow()
+          //&& ImGui::IsMouseHoveringWindow()
           && ImGui::IsMouseClicked(1))
         {
             m_pSelectedNode = nullptr;
@@ -710,7 +710,8 @@ void Editor::DrawNode(Node* node, ImVec2& offset, bool& openContextMenu)
             {
                 if (node->AsColor)
                 {
-                    ImGuiRect(ImVec2(64, 64), ImVec4(node->Values[0], node->Values[1], node->Values[2], node->Values[3]));
+                    auto color = ImVec4(node->Values[0], node->Values[1], node->Values[2], node->Values[3]);
+                    ImGuiRect(ImVec2(64, 64), color);
                 }
                 else
                 {
@@ -850,6 +851,14 @@ void Editor::DrawSlot(Slot* slot)
             return;
         }
 
+        // 既に入力スロットは1つしか入力を受け付けない。
+        // そのため，入力スロットに既に接続がある場合は除外する.
+        if (slot->Kind == SlotType::Output && targetSlot->pPrev != nullptr
+         || slot->Kind == SlotType::Input  && targetSlot->pNext != nullptr)
+        {
+            return;
+        }
+
         // データ型をチェックする.
         if (slot->Type != targetSlot->Type)
         {
@@ -859,13 +868,9 @@ void Editor::DrawSlot(Slot* slot)
 
         // 入力と出力を決定.
         if (targetSlot->Kind == SlotType::Input)
-        {
-            AddLink(slot, targetSlot);
-        }
+        { AddLink(slot, targetSlot); }
         else
-        {
-            AddLink(targetSlot, slot);
-        }
+        { AddLink(targetSlot, slot); }
     }
     else if (slot->Kind == SlotType::Input)
     {
@@ -919,13 +924,9 @@ void Editor::DrawContextMenu()
             if (ImGui::MenuItem(u8"シェーダ出力"))
             {
                 if (m_EditData.Export())
-                {
-                    InfoDlg("シェーダ出力成功", "シェーダを出力しました!");
-                }
+                { InfoDlg("シェーダ出力成功", "シェーダを出力しました!"); }
                 else
-                {
-                    ErrorDlg("シェーダ出力失敗", "シェーダの出力に失敗しました...");
-                }
+                { ErrorDlg("シェーダ出力失敗", "シェーダの出力に失敗しました..."); }
             }
 
             ImGui::Separator();
@@ -1225,8 +1226,8 @@ void Editor::DrawPresetFuncNodeMenu()
 //-----------------------------------------------------------------------------
 void Editor::DrawPreviewPanel()
 {
-    ImGui::SetNextWindowPos(ImVec2(m_Size.x - 400, 0.0f), ImGuiSetCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(400.0f, 420.0f), ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(m_Size.x - 400, 0.0f), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(400.0f, 420.0f), ImGuiCond_Once);
     ImGui::Begin(u8"プレビュー");
     ImGui::Image(m_Preview, ImVec2(390, 390));
     ImGui::End();
@@ -1237,8 +1238,8 @@ void Editor::DrawPreviewPanel()
 //-----------------------------------------------------------------------------
 void Editor::DrawPropPanel()
 {
-    ImGui::SetNextWindowPos(ImVec2(m_Size.x - 400, 420.0f), ImGuiSetCond_Once);
-    ImGui::SetNextWindowSize(ImVec2(400.0f, m_Size.y - 420.0f), ImGuiSetCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(m_Size.x - 400, 420.0f), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(400.0f, m_Size.y - 420.0f), ImGuiCond_Once);
     ImGui::Begin(u8"プロパティ");
 
     auto node = m_pSelectedNode;
@@ -1284,7 +1285,8 @@ void Editor::DrawPropPanel()
                 ImGui::Text(u8"データ型：float3");
                 if (node->AsColor)
                 {
-                    ImGui::ColorEdit3(u8"色", node->Values);
+                    int flags = ImGuiColorEditFlags_Float | ImGuiColorEditFlags_PickerHueWheel;
+                    ImGui::ColorPicker3(u8"色", node->Values, flags);
                 }
                 else
                 {
@@ -1296,7 +1298,8 @@ void Editor::DrawPropPanel()
                 ImGui::Text(u8"データ型：float4");
                 if (node->AsColor)
                 {
-                    ImGui::ColorEdit4(u8"色", node->Values);
+                    int flags = ImGuiColorEditFlags_Float | ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_AlphaBar;
+                    ImGui::ColorPicker4(u8"色", node->Values, flags);
                 }
                 else
                 {

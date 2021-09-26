@@ -49,7 +49,6 @@ public:
     void Term();
     void Update( uint32_t width, uint32_t height );
     void Draw();
-    void OnDraw( ImDrawData* draw_data );
     void OnMouse( int x, int y, int wheelDelta, bool isDownL, bool isDownM, bool isDownR );
     void OnKey( bool isDown, bool isAltDown, uint32_t code );
     void OnTyping( uint32_t code );
@@ -81,4 +80,6 @@ private:
     //=============================================================================================
     GuiMgr();
     ~GuiMgr();
+
+    void OnDraw( ImDrawData* draw_data );
 };
